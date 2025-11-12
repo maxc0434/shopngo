@@ -19,7 +19,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="index"
         options={{
-          title: "Home",
+          title: "Accueil",
           tabBarIcon: ({ color }) => (
             <Ionicons size={28} name="home" color={color} />
           ),
@@ -28,7 +28,7 @@ export default function TabLayout() {
       <Tabs.Screen
         name="shop"
         options={{
-          title: "shop",
+          title: "Boutique",
           tabBarIcon: ({ color }) => (
             <Foundation size={28} name="shopping-cart" color={color} />
           ),
@@ -38,12 +38,16 @@ export default function TabLayout() {
       <Tabs.Screen
         name="profile"
         options={{
-          title: "profile",
+          title: "Profil",
           tabBarIcon: ({ color }) => (
             <Feather size={28} name="user" color={color} />
           ),
         }}
       />
+
+      <Tabs.Screen name="search" options={{ href: null}}/>
+      <Tabs.Screen name="favorites" options={{ href: null}}/>
+      <Tabs.Screen name="cart" options={{ href: null}}/>
     </Tabs>
   );
 }
