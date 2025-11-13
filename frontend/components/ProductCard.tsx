@@ -76,4 +76,15 @@ const styles = StyleSheet.create({
         width: 150,
         marginRight: 12,
     },
+    card:{
+        backgroundColor: AppColors.background.primary,
+        borderRadius: 12,
+        overflow: 'hidden',
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2},
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 2,
+        width: '48%',
+    }
 })
