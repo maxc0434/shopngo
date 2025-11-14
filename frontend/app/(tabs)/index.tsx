@@ -103,9 +103,9 @@ export default function HomeScreen() {
             </ScrollView>
           </View>
           {/* Section des produits "Meilleurs ventes" */}
-          <View>
+          <View style={styles.featuredSection}>
             <View style={styles.sectionHeader}>
-              <Text style={styles.sectionTitle}> Meilleurs Ventes </Text>
+              <Text style={styles.sectionTitle}> Meilleures Ventes </Text>
                 <TouchableOpacity 
                 // onPress={navigateToAllProducts}
                 >
@@ -119,12 +119,34 @@ export default function HomeScreen() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.featuredProductsContainer}
             renderItem={({ item }) => (
-              <View>
-                <ProductCard item={item} compact/>
+              <View style={styles.featuredProductsContainer}>
+                <ProductCard product={item} compact/>
               </View>
             )}
             />
           </View>
+
+          {/* Section des produits les plus récents */}
+          <View style={styles.newestSection}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}> Nouveautées </Text>
+              <TouchableOpacity>
+                <Text> Voir tout </Text>
+              </TouchableOpacity>
+            </View>
+            <View style={styles.productsGrid}>
+              {products?.map((product) => (
+                <View key={product.id} style={styles.productContainer}>
+                  <ProductCard
+                  product={product}
+                  customStyle={{width: "100%"}}
+                  />
+                </View>
+              ))}
+            </View>
+          </View>
+
+
         </ScrollView>
       </View>
     </View>
@@ -153,6 +175,7 @@ const styles = StyleSheet.create({
   },
   contentContainer: {
     paddingLeft: 20,
+    paddingRight: 20,
     // paddingHorizontal: 20,
   },
   scrollContainerView: {
@@ -191,6 +214,29 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: AppColors.primary[500],
   },
-  
+  featuredProductsContainer: {
+
+  },
+  productsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    paddingRight: 20,
+  },
+  featuredSection: {
+    marginVertical: 16,
+  },
+  newestSection: {
+    marginVertical: 16,
+    marginBottom: 32,
+  },
+  productContainer: {
+    width: '48%',
+  },
+  seeAllText:{
+    fontFamily:'Inter-medium',
+    fontSize: 14,
+    color: AppColors.primary[500],
+  },
 
 });

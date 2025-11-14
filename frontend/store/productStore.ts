@@ -9,7 +9,7 @@ import { create } from 'zustand';
 // Import du Middleware pour la persistance de l'état
 import { createJSONStorage, persist } from 'zustand/middleware';
 
-    // Définitin de l'interface pour le state du store
+    // Définition de l'interface pour le state du store
     interface ProductsState {
         products: Product[];                //Liste complète des produits
         filteredProducts: Product[];        //Liste des produits filtrés

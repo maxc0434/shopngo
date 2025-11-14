@@ -1,7 +1,9 @@
-import { StyleProp, StyleSheet, Text, View, ViewStyle } from 'react-native'
+import { Alert, Image, StyleProp, StyleSheet, Text, TouchableOpacity, View, ViewStyle } from 'react-native'
 import React from 'react'
 import { Product } from '@/type'
 import { AppColors } from '@/constants/theme';
+import Button from './Button';
+import Toast from 'react-native-toast-message';
 
 
 interface ProductCardProps {
@@ -13,10 +15,47 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({
     product, compact=false, customStyle
 }) => {
+    const { id, title, price, category, image } = product;
+
+    const handleAddToCart = () => {
+        Toast.show({
+            type: 'success',
+            text1: `Produit ${title} ajouté au panier`,
+            text2: "Voir le panier pour finaliser la commande",
+            visibilityTime: 2000,
+            position: 'bottom',
+        })
+        // Alert.alert(`Produit ${title} ajouté au panier`);
+    }
+
   return (
-    <View>
-      <Text>ProductCard</Text>
-    </View>
+    <TouchableOpacity style= {
+        [styles.card, compact && styles.compactCard, customStyle]}
+        activeOpacity={0.8}>
+
+      <View style={styles.imageContainer}> 
+        <Image
+        source={{ uri: image }}
+        style={styles.image}
+        resizeMode='contain'
+        />
+      </View>
+
+
+      <View style={styles.content}>
+        <Text style={styles.category}>{category}</Text>
+        <Text
+            style={styles.title}
+            numberOfLines={compact ? 1 : 2}
+            ellipsizeMode='tail'
+        > {title}</Text>
+        <View style={styles.footer}>
+            <Text style={[styles.price, !compact && { marginBottom: 4}]}>€{price.toFixed(2)}</Text>
+            {!compact && <Button onPress={handleAddToCart} title='Au panier' size='small' variant='outline'/>}
+        </View>
+
+      </View>
+    </TouchableOpacity>
   )
 }
 
@@ -38,6 +77,7 @@ const styles = StyleSheet.create({
         fontSize: 12,
         color: AppColors.text.tertiary,
         textTransform: 'capitalize',
+        marginBottom: 4,
     },
     content: {
         padding: 12,
@@ -86,5 +126,8 @@ const styles = StyleSheet.create({
         shadowRadius: 8,
         elevation: 2,
         width: '48%',
-    }
+        marginBottom: 16,
+        borderWidth: 1,
+        borderColor: AppColors.gray[200],
+    },
 })
