@@ -3,22 +3,47 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from "react-native";
-import React from "react";
+import React, { useState } from "react";
 import { AppColors } from "@/constants/theme";
 import Wrapper from "@/components/Wrapper";
 import { Foundation } from "@expo/vector-icons";
+import { useAuthStore } from "@/store/authStore";
+import { useRouter } from "expo-router";
 
 const SignUpScreen = () => {
+
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const [emailError, setEmailError] = useState("");
+    const [passwordError, setPasswordError] = useState("");
+    const [confirmError, setConfirmError] = useState("");
+    const router = useRouter();
+    const {signup, isLoading, error} = useAuthStore();
+
   return (
     <Wrapper>
-      <KeyboardAvoidingView>
-        <ScrollView>
-          <View>
-            <View>
-              <Foundation/>
+      <KeyboardAvoidingView
+      style={styles.container}
+      >
+        <ScrollView contentContainerStyle={styles.scrollContainer}>
+          <View style={styles.header}>
+            <View style={styles.logoContainer}>
+              <Foundation
+              name="shopping-cart"
+              size={40}
+              color={AppColors.primary[500]}
+              />
             </View>
+            <Text style={styles.title}>ShopnGo</Text>
+            <Text style={styles.subtitle}>Créez un nouveau compte</Text>
+          </View>
+          <View>
+            {error && <Text style={styles.errorText}> {error}</Text>}
+            
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -31,7 +56,7 @@ export default SignUpScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: AppColors.background.primary,
+    // backgroundColor: AppColors.background.primary,
   },
   scrollContainer: {
     flexGrow: 1,
@@ -41,6 +66,20 @@ const styles = StyleSheet.create({
   header: {
     alignItems: "center",
     marginBottom: 40,
+  },
+    logoContainer: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: AppColors.primary[50],
+    alignItems: "center",
+    justifyContent: 'center',
+    marginBottom: 16,
+  },
+    title: {
+    fontFamily: 'Inter-Bold',
+    fontSize: 28,
+    color: AppColors.text.primary,
   },
   subtitle: {
     fontFamily: "Inter-Regular",
