@@ -1,6 +1,5 @@
 import { Platform, StyleSheet, Text, View } from "react-native";
 import React, { useEffect } from "react";
-import { SafeAreaView } from "react-native-safe-area-context";
 import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "expo-router";
 import Wrapper from "@/components/Wrapper";
@@ -22,6 +21,7 @@ const ProfileScreen = () => {
       {user ? (
         <View>
           <Text>User disponible</Text>
+          <Text>{user?.email}</Text>
         </View>
       ) : (
         <View style={styles.container}>

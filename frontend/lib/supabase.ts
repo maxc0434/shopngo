@@ -44,7 +44,7 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
   auth: {
     storage: ExpoSecureStoreAdapter, // Utilisation de l'adaptateur pour le stockage sécurisé des tokens
     autoRefreshToken: true,          // Rafraîchissement automatique du token d'authentification
-    persistSession: true,            // Persistance de la session utilisateur
+    persistSession: true,            // Persistance de la session utilisateur (login l'utilisateur et garde la session ouverte)
     detectSessionInUrl: false,       // Désactivation de la détection automatique dans l'URL (utile pour React Native)
   },
   realtime: {

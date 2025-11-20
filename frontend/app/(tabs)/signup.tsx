@@ -3,7 +3,6 @@ import {
   ScrollView,
   StyleSheet,
   Text,
-  TextInput,
   View,
 } from "react-native";
 import React, { useState } from "react";
@@ -12,38 +11,110 @@ import Wrapper from "@/components/Wrapper";
 import { Foundation } from "@expo/vector-icons";
 import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "expo-router";
+import TextInput from "@/components/TextInput";
+import Button from "@/components/Button";
 
 const SignUpScreen = () => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [emailError, setEmailError] = useState("");
+  const [passwordError, setPasswordError] = useState("");
+  const [confirmError, setConfirmError] = useState("");
+  const router = useRouter();
+  const { signup, isLoading, error } = useAuthStore();
 
-    const [email, setEmail] = useState("");
-    const [password, setPassword] = useState("");
-    const [confirmPassword, setConfirmPassword] = useState("");
-    const [emailError, setEmailError] = useState("");
-    const [passwordError, setPasswordError] = useState("");
-    const [confirmError, setConfirmError] = useState("");
-    const router = useRouter();
-    const {signup, isLoading, error} = useAuthStore();
+  const validateForm = () => {
+    let isValid = true;
+    //validation email
+    if(!email.trim()) {
+      setEmailError('Email obligatoire');
+      isValid = false;
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      setEmailError('Adresse email invalide');
+      isValid = false;
+    } else {
+      setEmailError("");
+    }
+    //validation mot de passe
+    if(!password) {
+      setPasswordError('Mot de passe obligatoire');
+      isValid = false
+    } else if (password.length < 6) {
+      setPasswordError('le mot de passe doit contenir au moins 6 caractères');
+    } else {
+      setPasswordError("");
+    }
+    //confirmation de mot de passe
+    if(password !== confirmPassword) {
+      setConfirmError("Les 2 mots de passe ne sont pas les mêmes");
+      isValid = false;
+    } else {
+      setConfirmError("");
+    }
+    return isValid;
+  };
+
+  const handleSignUp = async () => {
+    if (validateForm()) {
+      await signup(email, password);
+      router.push("/(tabs)/login");
+      setEmail("");
+      setPassword("");
+      setConfirmPassword("");
+    }
+  };
 
   return (
     <Wrapper>
-      <KeyboardAvoidingView
-      style={styles.container}
-      >
+      <KeyboardAvoidingView style={styles.container}>
         <ScrollView contentContainerStyle={styles.scrollContainer}>
           <View style={styles.header}>
             <View style={styles.logoContainer}>
               <Foundation
-              name="shopping-cart"
-              size={40}
-              color={AppColors.primary[500]}
+                name="shopping-cart"
+                size={40}
+                color={AppColors.primary[500]}
               />
             </View>
             <Text style={styles.title}>ShopnGo</Text>
             <Text style={styles.subtitle}>Créez un nouveau compte</Text>
           </View>
-          <View>
+          <View style={styles.form}>
             {error && <Text style={styles.errorText}> {error}</Text>}
-            
+            <TextInput
+              label="Email"
+              value={email}
+              onChangeText={setEmail}
+              placeholder="Entrez votre Email"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+              error={emailError}
+            />
+            <TextInput
+              label="Mot de passe"
+              value={password}
+              onChangeText={setPassword}
+              placeholder="Entrez votre mot de passe"
+              error={passwordError}
+              secureTextEntry
+            />
+            <TextInput
+              label="Confirmez votre mot de passe"
+              value={confirmPassword}
+              onChangeText={setConfirmPassword}
+              placeholder="Entrez votre mot de passe"
+              error={confirmError}
+              secureTextEntry
+            />
+            <Button
+            onPress={handleSignUp}
+            title="Inscription"
+            fullWidth
+            loading={isLoading}
+            style={styles.button}
+            />
           </View>
         </ScrollView>
       </KeyboardAvoidingView>
@@ -67,17 +138,17 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 40,
   },
-    logoContainer: {
+  logoContainer: {
     width: 80,
     height: 80,
     borderRadius: 40,
     backgroundColor: AppColors.primary[50],
     alignItems: "center",
-    justifyContent: 'center',
+    justifyContent: "center",
     marginBottom: 16,
   },
-    title: {
-    fontFamily: 'Inter-Bold',
+  title: {
+    fontFamily: "Inter-Bold",
     fontSize: 28,
     color: AppColors.text.primary,
   },
