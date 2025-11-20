@@ -17,7 +17,7 @@ const ShopScreen = () => {
       const data = await response.json();
       setProducts(data);
     };
-    getProducts(data);
+    getProducts();
   }, [])
 
   return (
