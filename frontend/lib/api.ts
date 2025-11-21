@@ -52,4 +52,39 @@ const getCategories = async (): Promise<string[]> => {
   }
 };
 
-export { getProducts, getProduct, getCategories };
+const getProductsByCategory = async ( category: string ): Promise<Product[]> => {
+  try {
+    const response = await fetch(`${API_URL}/products/category/${category}`);
+    if (!response.ok){
+      throw new Error("Network response was not ok");
+    }
+    return await response.json();
+  } catch (error) {
+      console.error(`Failed to fetch products in category ${category}:`, error);
+      throw error;
+  }
+}
+
+const searchProductsApi = async (query: string): Promise<Product[]> => {
+  try {
+    const response = await fetch (`${API_URL}/products`);
+    if (!response.ok) {
+      throw new Error("Network response was not ok");
+    }
+
+    const products = await response.json();
+    const searchTerm = query.toLowerCase().trim();
+
+    return products.filter(
+      (product :Product) =>
+        product.title.toLowerCase().includes(searchTerm) ||
+      product.description.toLowerCase().includes(searchTerm) ||
+      product.category.toLocaleLowerCase().includes(searchTerm)
+    );
+  } catch (error) {
+    console.error("Failed to search products:", error);
+    throw error;
+  }
+};
+
+export { getProducts, getProduct, getCategories, getProductsByCategory, searchProductsApi };

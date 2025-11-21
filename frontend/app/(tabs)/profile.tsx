@@ -23,7 +23,7 @@ import {
 import Toast from "react-native-toast-message";
 
 const ProfileScreen = () => {
-  const { user, logout, checkSession } = useAuthStore();
+  const { user, logout, checkSession, isLoading } = useAuthStore();
   const router = useRouter();
 
   useEffect(() => {
@@ -113,7 +113,8 @@ const ProfileScreen = () => {
               visibilityTime: 2000,
             });
           } catch (error) {
-            
+            console.error("Profil: Erreur pendant la déconnexion:", error);
+            Alert.alert("Erreur de déconnexion", "Une erreur est survenue");
           }
         }
       }
@@ -165,6 +166,7 @@ const ProfileScreen = () => {
               variant='outline'
               fullWidth style={styles.logoutButton}
               textStyle={styles.logoutButtonText}
+              disabled={isLoading}
             />
           </View>
         </View>
