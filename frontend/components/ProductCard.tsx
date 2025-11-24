@@ -16,7 +16,7 @@ interface ProductCardProps {
 const ProductCard: React.FC<ProductCardProps> = ({
     product, compact=false, customStyle
 }) => {
-    const { id, title, price, category, image } = product;
+    const { id, title, price, category, image, rating } = product;
 
     const router = useRouter();
     const handleProductRoute = (e: any) => {
@@ -61,6 +61,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
         <View style={styles.footer}>
             <Text style={[styles.price, !compact && { marginBottom: 4}]}>€{price.toFixed(2)}</Text>
             {!compact && <Button onPress={handleAddToCart} title='Au panier' size='small' variant='outline'/>}
+            <Text style={[styles.ratingText, !compact && {marginBottom: 7}]}> Notes: {rating?.rate}/{`(${rating?.count})`}</Text>
         </View>
 
       </View>
@@ -138,5 +139,10 @@ const styles = StyleSheet.create({
         marginBottom: 16,
         borderWidth: 1,
         borderColor: AppColors.gray[200],
+    },
+        ratingText: {
+        marginBottom: 8,
+        textTransform: 'capitalize',
+        color: AppColors.gray[600],
     },
 })
