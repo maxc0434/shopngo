@@ -1,6 +1,6 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import React from "react";
-import { Feather } from "@expo/vector-icons";
+import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 import { AppColors } from "@/constants/theme";
 
 interface RatingProps {
@@ -11,44 +11,44 @@ interface RatingProps {
 }
 
 const Rating: React.FC<RatingProps> = ({
-  rating,
-  count,
-  size = 16,
-  showCount = true,
+  rating, count,
+  size = 16, showCount = true,
 }) => {
   const roundedRating = Math.round(rating * 2) / 2;
-  const renderStars = () => {
-    const stars = [];
-    //Full Star
-    for (let i = 1; i <= Math.floor(roundedRating); i++) {
-      stars.push(
-        <Feather
-          name="star"
-          key={`star-${i}`}
-          size={size}
-          color={AppColors.accent[500]}
-          fill={AppColors.accent[500]}
-        />
-      );
-    }
+  
+const renderStars = () => {
+  const stars = [];
+  const fullStars = Math.floor(roundedRating);
+  const emptyStars = 5 - fullStars;
 
-    const emptyStars = 5 - Math.ceil(roundedRating);
-    for (let i = 1; i <= emptyStars; i ++) {
-        stars.push(
-            <Feather
-                name='star'
-                size={size}
-                color={AppColors.accent[500]}
-                style={styles.halfStarforeground}
-            />
-        );
-    }
-    return stars;
-  };
+  for (let i = 1; i <= fullStars; i++) {
+    stars.push(
+      <AntDesign
+        name="star"
+        key={`star-full-${i}`}
+        size={size}
+        color={AppColors.accent[500]}
+      />
+    );
+  }
+
+  for (let i = 1; i <= emptyStars; i++) {
+    stars.push(
+      <MaterialIcons
+        name="star-outline"
+        key={`star-empty-${i}`}
+        size={size}
+        color={AppColors.accent[500]}
+      />
+    );
+  }
+
+  return stars;
+};
 
   return (
     <View style={styles.container}>
-      <View>
+      <View style={styles.starsContainer}>
         {renderStars()}
       </View>
     </View>

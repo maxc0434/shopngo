@@ -4,6 +4,7 @@ import {
   ScrollView,
   StyleSheet,
   Text,
+  TouchableOpacity,
   View,
 } from "react-native"; // Import des composants de base React Native
 import React, { useEffect, useState } from "react"; // Import de React et des hooks pour la gestion d'état et effets
@@ -14,6 +15,8 @@ import { Product } from "@/type"; // Import du type Product pour typer les donn�
 import { getProduct } from "@/lib/api"; // Import de la fonction pour récupérer un produit depuis l'API
 import LoadingSpinner from "@/components/LoadingSpinner";
 import Button from "@/components/Button";
+import Rating from "@/components/Rating";
+import { AntDesign } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
 
@@ -90,12 +93,59 @@ const SingleProductScreen = () => {
           />
         </View>
         <View style={styles.productInfo}>
-            <Text style={styles.category}>
-                {product?.category?.charAt(0).toUpperCase() + product?.category.slice(1)}
-            </Text>
-            <Text style={styles.title}>{product?.title}</Text>
+          <Text style={styles.category}>
+            {product?.category?.charAt(0).toUpperCase() +
+              product?.category.slice(1)}
+          </Text>
+          <Text style={styles.title}>{product?.title}</Text>
+          <View style={styles.ratingContainer}>
+            <Rating
+              rating={product?.rating?.rate}
+              count={product?.rating?.count}
+            />
+          </View>
+          <Text style={styles.price}>€{product?.price.toFixed(2)}</Text>
+          <View>
+            <Text style={styles.descriptionTitle}>Description</Text>
+            <Text style={styles.description}>{product.description}</Text>
+            <View>
+              <Text>Quantité</Text>
+              <View>
+                <TouchableOpacity 
+                  onPress={() => {
+                    if (quantity > 1) {
+                      setQuantity((prev) => prev-1)
+                    }
+                  }}
+                  disabled={quantity <= 1}
+                  style={styles.quantityButton}>
+                  <AntDesign
+                    name="minus"
+                    size={20}
+                    color={AppColors.primary[600]}
+                  />
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  onPress={() => {
+                      setQuantity((prev) => prev+1)
+                  }}
+                  style={styles.quantityButton}>
+                  <AntDesign
+                    name="plus"
+                    size={20}
+                    color={AppColors.primary[600]}
+                  />
+                </TouchableOpacity>
+                
+              </View>
+            </View>
+          </View>
         </View>
       </ScrollView>
+      <View style={styles.footer}>
+        <Text style={styles.totalPrice}>Total: {(product?.price * quantity).toFixed(2)} €</Text>
+
+      </View>
     </View>
   );
 };
