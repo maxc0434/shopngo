@@ -5,6 +5,7 @@ import { AppColors } from '@/constants/theme';
 import Button from './Button';
 import Toast from 'react-native-toast-message';
 import { useRouter } from 'expo-router';
+import Rating from './Rating';
 
 
 interface ProductCardProps {
@@ -59,9 +60,20 @@ const ProductCard: React.FC<ProductCardProps> = ({
             ellipsizeMode='tail'
         > {title}</Text>
         <View style={styles.footer}>
-            <Text style={[styles.price, !compact && { marginBottom: 4}]}>€{price.toFixed(2)}</Text>
-            {!compact && <Button onPress={handleAddToCart} title='Au panier' size='small' variant='outline'/>}
-            <Text style={[styles.ratingText, !compact && {marginBottom: 7}]}> Notes: {rating?.rate}/{`(${rating?.count})`}</Text>
+            <Text style={[styles.price, !compact && { marginBottom: 4}]}>
+                €{price.toFixed(2)}
+            </Text>
+            <View>
+                <Rating 
+                    rating={rating?.rate}
+                    count={rating?.count}
+                    size={12}
+                />
+            </View>
+            {!compact && 
+            <Button onPress={handleAddToCart} title='Au panier' size='small' variant='outline'/>
+            }
+            
         </View>
 
       </View>
