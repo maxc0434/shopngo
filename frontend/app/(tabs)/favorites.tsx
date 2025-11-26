@@ -29,37 +29,44 @@ const FavoritesScreen = () => {
     </Wrapper>
   }
 
-  return (
-    <View>
+return (
+    <View style={{flex: 1}}>
       <HomeHeader />
-      {favoriteItems?.length > 0 && (
-        <Wrapper>
+        {favoriteItems?.length > 0 && (
+      <Wrapper>
           <View style={styles.headerView}>
             <View style={styles.header}>
-              <Text style={styles.title}> Liste des Produits favoris </Text>
-              <Text style={styles.itemCount}> produits </Text>
+              <Text style={styles.title}>Mes favoris</Text>
+              <Text style={styles.itemCount}>{favoriteItems?.length} Produits</Text>
             </View>
             <View>
-              <TouchableOpacity onPress={() => resetFavorite()}>
-                <Text style={styles.resetText}> Reset les favoris</Text>
+              <TouchableOpacity
+              onPress={() => resetFavorite()}
+              >
+                <Text style={styles.resetText}>Réinitialiser</Text>
               </TouchableOpacity>
             </View>
-          </View>
-          <FlatList
-            data={favoriteItems}
-            keyExtractor={(item)=>item.id.toString()}
-            numColumns={2}
-            renderItem={({item}) => (
-              <View>
-                <ProductCard product={item} customStyle={{width: '100%'}}/>
-              </View>
-            )}
-            contentContainerStyle={styles.productsGrid}
-            columnWrapperStyle={styles.columnWrapper}
-            showsVerticalScrollIndicator={false}
-            ListFooterComponent={<View style={styles.footer}/>}
-          />
-        </Wrapper>
+            </View>
+               <FlatList
+               data={favoriteItems}
+               keyExtractor={(item)=>item.id.toString()}
+                numColumns={2}
+                renderItem={({item}) =>(
+                 <View style={styles.productContainer}>
+                      <ProductCard product={item} customStyle={{width: '100%'}} />
+                 </View>
+                )}
+                // Style de la grille principale
+                contentContainerStyle={styles.productsGrid}
+                // Espacement entre les colonnes
+                columnWrapperStyle={styles.columnWrapper}
+                // Masque la barre de défilement verticale
+                showsVerticalScrollIndicator={false}
+                // Marge en bas de la liste
+                ListFooterComponent={<View style={styles.footer} />}
+
+                />
+      </Wrapper>
       )}
     </View>
   );
