@@ -14,9 +14,12 @@ import { AppColors } from "@/constants/theme"; // Import des constantes de coule
 import { Product } from "@/type"; // Import du type Product pour typer les données produit
 import { getProduct } from "@/lib/api"; // Import de la fonction pour récupérer un produit depuis l'API
 import LoadingSpinner from "@/components/LoadingSpinner";
-import Button from "@/components/Button";
 import Rating from "@/components/Rating";
 import { AntDesign } from "@expo/vector-icons";
+import Toast from "react-native-toast-message";
+import Button from "@/components/Button";
+import { useCartStore } from "@/store/cartStore";
+import { useFavoritesStore } from "@/store/favoriteStore";
 
 const { width } = Dimensions.get("window");
 
@@ -39,7 +42,17 @@ const SingleProductScreen = () => {
 
   const idNum = Number(id);
 
+  const {addItem} = useCartStore();
+
+  const { isFavorite, toggleFavorite } = useFavoritesStore();
+
   const router = useRouter();
+
+  const handleToggleFavorite = () => {
+    if (product) {
+      toggleFavorite(product);
+    }
+  }
 
   // Effet déclenché à chaque changement d'id pour récupérer les données du produit
   useEffect(() => {
@@ -55,7 +68,6 @@ const SingleProductScreen = () => {
         setLoading(false); // Désactiver le loader à la fin de la requête
       }
     };
-
     // Lancer la récupération uniquement si l'id est défini
     if (id) {
       fetchProductData();
@@ -81,9 +93,21 @@ const SingleProductScreen = () => {
     );
   }
 
+  const isFav = isFavorite(product?.id);
+  const handleAddToCart = () => {
+    addItem(product, quantity);
+
+    Toast.show({
+      type: 'success',
+      text1: `Produit ${product?.title} ajouté au panier`,
+      text2: 'Voir le Panier pour finaliser votre achat',
+      visibilityTime: 2000,
+    });
+  };
+
   return (
     <View style={styles.headerContainerStyle}>
-      <CommonHeader />
+      <CommonHeader isFav={isFav} handleToggleFavorite={handleToggleFavorite}/>
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.imageContainer}>
           <Image
@@ -108,9 +132,9 @@ const SingleProductScreen = () => {
           <View>
             <Text style={styles.descriptionTitle}>Description</Text>
             <Text style={styles.description}>{product.description}</Text>
-            <View>
-              <Text>Quantité</Text>
-              <View>
+            <View style={styles.quantityContainer}>
+              <Text style={styles.quantityTitle}>Quantité</Text>
+              <View style={styles.quantityControls}>
                 <TouchableOpacity 
                   onPress={() => {
                     if (quantity > 1) {
@@ -125,6 +149,7 @@ const SingleProductScreen = () => {
                     color={AppColors.primary[600]}
                   />
                 </TouchableOpacity>
+                <Text style={styles.quantityValue}>{quantity}</Text>
                 <TouchableOpacity 
                   onPress={() => {
                       setQuantity((prev) => prev+1)
@@ -144,6 +169,11 @@ const SingleProductScreen = () => {
       </ScrollView>
       <View style={styles.footer}>
         <Text style={styles.totalPrice}>Total: {(product?.price * quantity).toFixed(2)} €</Text>
+        <Button
+          title="Ajouter au panier"
+          onPress={handleAddToCart}
+          style={styles.addToCartButton}
+        />
 
       </View>
     </View>
@@ -224,7 +254,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    marginBottom: 24,
+    marginBottom: 30,
   },
   description: {
     fontFamily: "Inter-Regular",
