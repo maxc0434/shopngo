@@ -4,8 +4,13 @@ import express from "express";
 // Charge automatiquement les variables d'environnement définies dans un fichier .env
 import "dotenv/config";
 
-// Importe le middleware CORS pour autoriser les requêtes provenant d'autres origines (front-end différent, etc.)
+// Importe le middleware CORS pour autoriser les requêtes provenant d'autres origines 
+// (par exemple frontend ET backend qui envoient des requetes sur le navigateur)
 import cors from "cors";
+
+import checkout from "./routes/checkout.js"
+
+
 
 
 // Crée une instance de l'application Express
@@ -26,6 +31,7 @@ app.use(express.json());
 app.get("/", (req, res) => {
     res.send("ON A EU LES DROITS !");
 });
+app.use("/",checkout)
 
 // Démarre le serveur HTTP et l'écoute sur le port défini plus haut
 // Quand le serveur est prêt, on affiche un message dans la console
