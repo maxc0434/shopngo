@@ -41,7 +41,7 @@ const ProductCard: React.FC<ProductCardProps> = ({
             text1: `Produit ${title} ajouté au panier`,
             text2: "Voir le panier pour finaliser la commande",
             visibilityTime: 2000,
-            position: 'bottom',
+            position: 'top',
         })
         // Alert.alert(`Produit ${title} ajouté au panier`);
     }
@@ -65,12 +65,12 @@ const ProductCard: React.FC<ProductCardProps> = ({
         />
         <TouchableOpacity
             onPress={handleToggleFavorite}
-            style={[styles.favoriteButton, { borderWidth: isFav ? 1 : 0}]}
+            style={[styles.favoriteButton]}
             >
             <AntDesign
                 name='heart'
-                size={18}
-                color={AppColors.text.primary}
+                size={15}
+                color={isFav ? AppColors.error : AppColors.gray[400]}
             />
         </TouchableOpacity>
       </View>
