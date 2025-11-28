@@ -1,5 +1,5 @@
 import { Router } from "express";
-
+import stripe from "../lib/stripe.js";
 
 const router = Router()
 
@@ -23,7 +23,7 @@ router.post("/checkout", async (req, res) => {
         //création d'un nouveau client stripe sans autres données supplémentaires
         const customer = await stripe.customers.create();
         //création d'une clé ephemere pour le client. Utile pour Stripe Mobile SDK
-        const ephemeralKey = await stripe.ephemeralKey.create(
+        const ephemeralKey = await stripe.ephemeralKeys.create(
             {
                 customer: customer.id,
             },
@@ -48,7 +48,7 @@ router.post("/checkout", async (req, res) => {
         return res.status(200).send({
             success: true,
             message: 'Session de paiement crée avec succès !',
-            payementIntent: payementIntent.client_secret,
+            paymentIntent: paymentIntent.client_secret,
             ephemeralKey: ephemeralKey.secret,
             customer: customer.id,
         });

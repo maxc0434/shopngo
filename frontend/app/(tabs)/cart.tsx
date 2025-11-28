@@ -1,4 +1,11 @@
-import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import {
+  FlatList,
+  Image,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View,
+} from "react-native";
 import React, { useState } from "react";
 import { Link, useRouter } from "expo-router";
 import { useCartStore } from "@/store/cartStore";
@@ -6,26 +13,27 @@ import { useAuthStore } from "@/store/authStore";
 import MainLayout from "@/components/MainLayout";
 import EmptyState from "@/components/EmptyState";
 import { AppColors } from "@/constants/theme";
-import  Title  from "@/components/customText";
+import Title from "@/components/customText";
 import { Product } from "@/type";
 import CartItem from "@/components/CartItem";
 import Button from "@/components/Button";
 import Toast from "react-native-toast-message";
 import { supabase } from "@/lib/supabase";
+import axios from "axios";
 
 const CartScreen = () => {
   const router = useRouter();
   const { items, getTotalPrice, clearCart } = useCartStore();
   const [loading, setLoading] = useState(false);
-  const {user} = useAuthStore();
+  const { user } = useAuthStore();
   const subtotal = getTotalPrice();
   const shippingCost = subtotal < 100 ? 0 : 5.99;
   const total = subtotal + shippingCost;
 
-  const handlePlaceOrder = async() => {
-    if(!user) {
+  const handlePlaceOrder = async () => {
+    if (!user) {
       Toast.show({
-        type:"error",
+        type: "error",
         text1: "Connexion requise",
         text2: "Connectez vous pour passer votre commande ",
         position: "bottom",
@@ -33,54 +41,93 @@ const CartScreen = () => {
       });
       return;
     }
-      try {
-        //On indique le chargement
-        setLoading(true);
-        //Préparation pour insertion des données de la commande en BDD
-        const orderData ={
-          user_email: user.email,
-          total_price: total,
-          items:items.map((item) => ({
-            product_id: item.product.id,
-            title: item.product.title,
-            price: item.product.price,
-            quantity: item.quantity,
-            image: item.product.image,
-          })),
-          payment_status: "en attente"
-        };
-        
-        //insertion de la commande dans la table orders
-        const {data, error}=await supabase
-          .from("orders")
-          .insert([orderData])
-          .select()
-          .single();
+    try {
+      //On indique le chargement
+      setLoading(true);
+      //Préparation pour insertion des données de la commande en BDD
+      const orderData = {
+        user_email: user.email,
+        total_price: total,
+        items: items.map((item) => ({
+          product_id: item.product.id,
+          title: item.product.title,
+          price: item.product.price,
+          quantity: item.quantity,
+          image: item.product.image,
+        })),
+        payment_status: "en attente",
+      };
 
-          // gestion des erreurs à l'insertion
-          if(error) {
-            throw new Error(`Echec de sauvegarde de la commande: ${error.message}`);
-          }
+      //insertion de la commande dans la table orders
+      const { data, error } = await supabase
+        .from("orders")
+        .insert([orderData])
+        .select()
+        .single();
 
+      // gestion des erreurs à l'insertion
+      if (error) {
+        throw new Error(`Echec de sauvegarde de la commande: ${error.message}`);
+      }
 
-      } catch (error) {
+      // On crée un objet "payload" qui contient les données à envoyer au serveur
+      const payload = {
+        price: total, // Le prix total, stocké dans la variable "total"
+        email: user?.email, // L'email de l'utilisateur, si disponible
+      };
+
+      // On envoie une requête HTTP POST au serveur avec axios
+      const response = await axios.post(
+        "http://192.168.50.34:8000/checkout", 
+        // "http://10.0.2.2:8000/checkout", 
+        // "http://localhost:8000/checkout", 
+        payload, // Les données à envoyer (le "payload" qu'on vient de créer)
+        {
+          headers: {
+            "Content-Type": "application/json", // On précise qu'on envoie du JSON
+          },
+        }
+        // Le résultat de la requête est stocké dans la variable "response"
+      );
+
+      // console.log("response", response);
+      const { paymentIntent, ephemeralKey, customer} = response.data;
+      // console.log("res", paymentIntent, ephemeralKey, customer);
+      if(!paymentIntent || !ephemeralKey || !customer) {
+        throw new Error("Données Stripe requises manquantes depuis le serveur");
+      } else {
         Toast.show({
-          type: "error",
-          text1: "Commande échouée",
+          type: "success",
+          text1: "Commande réussie",
           text2: "Echec de la commande",
           position: "bottom",
           visibilityTime: 2000,
         });
-        console.log("Erreur de la commande", error);
-        
-      } finally {
-        setLoading(false);
+        router.push({
+          pathname: "/(tabs)/payment",
+          params:{
+            paymentIntent,
+            ephemeralKey, 
+            customer,
+            orderId:data.id,
+            total: total,
+          },
+        });
       }
-    };
-
-
-
-
+      // gestion du cas d'erreur
+    } catch (error) {
+      Toast.show({
+        type: "error",
+        text1: "Commande échouée",
+        text2: "Echec de la commande",
+        position: "bottom",
+        visibilityTime: 2000,
+      });
+      console.log("Erreur de la commande", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <MainLayout>
@@ -97,47 +144,51 @@ const CartScreen = () => {
               </TouchableOpacity>
             </View>
           </View>
-            <FlatList
-              data={items}
-              keyExtractor={(item) => item.product.id.toString()}
-              renderItem={({ item }) => (<CartItem product={item.product} quantity={item.quantity} />)}
-              contentContainerStyle={styles.cartItemsContainer}
-              showsVerticalScrollIndicator={false}
-            />
-            <View style={styles.summaryContainer}>
-              <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>Sous-Total: </Text>
-                <Text style={styles.summaryValue}> {subtotal.toFixed(2)} €</Text>
-              </View>
-              {shippingCost > 0 && (
-                <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>Frais de port: </Text>
-                <Text style={styles.summaryValue}> {shippingCost.toFixed(2)} €</Text>
-              </View>
-              )}
-               <View style={styles.summaryRow}>
-                <Text style={styles.summaryLabel}>Total: </Text>
-                <Text style={styles.summaryValue}> {total.toFixed(2)} €</Text>
-              </View>
+          <FlatList
+            data={items}
+            keyExtractor={(item) => item.product.id.toString()}
+            renderItem={({ item }) => (
+              <CartItem product={item.product} quantity={item.quantity} />
+            )}
+            contentContainerStyle={styles.cartItemsContainer}
+            showsVerticalScrollIndicator={false}
+          />
+          <View style={styles.summaryContainer}>
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>Sous-Total: </Text>
+              <Text style={styles.summaryValue}> {subtotal.toFixed(2)} €</Text>
             </View>
-            <Button
-              title="Passer commande"
-              fullWidth
-              style={styles.checkoutButton}  
-              disabled = {!user || loading }
-              onPress={handlePlaceOrder}
-            />
-            {!user && (
-              <View style={styles.alertView}>
-                <Text style={styles.alertText}>
-                  Connectez-vous pour passer commande
+            {shippingCost > 0 && (
+              <View style={styles.summaryRow}>
+                <Text style={styles.summaryLabel}>Frais de port: </Text>
+                <Text style={styles.summaryValue}>
+                  {" "}
+                  {shippingCost.toFixed(2)} €
                 </Text>
-                <Link href={"/(tabs)/login"}>
-                  <Text style={styles.loginText}> Connexion</Text>
-                </Link>
               </View>
             )}
-          
+            <View style={styles.summaryRow}>
+              <Text style={styles.summaryLabel}>Total: </Text>
+              <Text style={styles.summaryValue}> {total.toFixed(2)} €</Text>
+            </View>
+          </View>
+          <Button
+            title="Passer commande"
+            fullWidth
+            style={styles.checkoutButton}
+            disabled={!user || loading}
+            onPress={handlePlaceOrder}
+          />
+          {!user && (
+            <View style={styles.alertView}>
+              <Text style={styles.alertText}>
+                Connectez-vous pour passer commande
+              </Text>
+              <Link href={"/(tabs)/login"}>
+                <Text style={styles.loginText}> Connexion</Text>
+              </Link>
+            </View>
+          )}
         </>
       ) : (
         <EmptyState
@@ -154,13 +205,12 @@ const CartScreen = () => {
 export default CartScreen;
 
 const styles = StyleSheet.create({
-
-  imageContainer:{
+  imageContainer: {
     width: 80,
     height: 80,
     backgroundColor: AppColors.background.secondary,
     borderRadius: 8,
-    overflow: 'hidden',
+    overflow: "hidden",
     marginRight: 16,
   },
 
