@@ -30,6 +30,7 @@ const CartScreen = () => {
   const shippingCost = subtotal < 100 ? 0 : 5.99;
   const total = subtotal + shippingCost;
 
+  // Verifie que l'utilisateur est connecté
   const handlePlaceOrder = async () => {
     if (!user) {
       Toast.show({
@@ -93,26 +94,27 @@ const CartScreen = () => {
       // console.log("response", response);
       const { paymentIntent, ephemeralKey, customer} = response.data;
       // console.log("res", paymentIntent, ephemeralKey, customer);
-      if(!paymentIntent || !ephemeralKey || !customer) {
+      if(!paymentIntent || !ephemeralKey || !customer) { //verification des données Stripe
         throw new Error("Données Stripe requises manquantes depuis le serveur");
-      } else {
+      } else { //Si toutes les données sont OK, Affichage de la confirmation de commande
         Toast.show({
           type: "success",
           text1: "Commande réussie",
-          text2: "Echec de la commande",
+          text2: "Commande passée avec succès",
           position: "bottom",
           visibilityTime: 2000,
         });
-        router.push({
+        router.push({ // navigation vers l'ecran de paiement avec les données de Stripe
           pathname: "/(tabs)/payment",
           params:{
-            paymentIntent,
-            ephemeralKey, 
-            customer,
-            orderId:data.id,
-            total: total,
+            paymentIntent, // données de Stripe
+            ephemeralKey, // données de Stripe
+            customer, // données de Stripe
+            orderId:data.id, // iD de la commande Supabase 
+            total: total, // total de la commande
           },
         });
+        clearCart(); //Vide le panier apres la commande
       }
       // gestion du cas d'erreur
     } catch (error) {

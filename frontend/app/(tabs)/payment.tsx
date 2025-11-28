@@ -2,13 +2,24 @@ import { StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { AppColors } from "@/constants/theme";
 import Button from "@/components/Button";
+import { useLocalSearchParams, useRouter } from "expo-router";
+import { useAuthStore } from "@/store/authStore";
 
+
+const getStringParam = (value: string | string[] | undefined): string =>
+  Array.isArray(value) ? value[0] : value || "";
 const PaymentScreen = () => {
+
+  const router = useRouter();
+  const { paymentIntent, ephemeralKey, customer, orderId, total } = useLocalSearchParams();
+  const {user} = useAuthStore();
+  const totalValue = Number(getStringParam(total));
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Complétez votre paiement</Text>
       <Text style={styles.subtitle}>Veuillez confirmer vos informations de paiement pour finaliser vos achats</Text>
-      <Text style={styles.totalPrice}> Total : €</Text>
+      <Text style={styles.totalPrice}> Total : {totalValue.toFixed(2)} €</Text>
       <Button
         title="Confirmez votre paiement"
         onPress={() => {}}
