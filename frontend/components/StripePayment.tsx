@@ -3,6 +3,7 @@ import React from 'react'
 import { useStripe } from "@stripe/stripe-react-native"
 import { useRouter } from 'expo-router';
 import { supabase } from '@/lib/supabase';
+import * as Linking from "expo-linking";
 
 
     type Props = {  //interface definissant les props requises pour le composant
@@ -23,12 +24,15 @@ import { supabase } from '@/lib/supabase';
         const { initPaymentSheet, presentPaymentSheet } = useStripe(); //extraction des fonctions principales de Stripe
         const router = useRouter();
 
+        const returnURL = Linking.createURL("/(tabs)/orders");
+
         const initializePaymentSheet = async () => { // initialisation du PaymentStripe avec les paramètres recus du backend
             const {error} = await initPaymentSheet({
                 paymentIntentClientSecret: paymentIntent,
                 customerId: customer,
                 customerEphemeralKeySecret: ephemeralKey,
                 merchantDisplayName: 'ShopNGO',
+                returnURL: returnURL,
             });
             if(error) {
                 throw new Error (`Echec de l'initialisation de la feuille de paiement: ${error}`);
