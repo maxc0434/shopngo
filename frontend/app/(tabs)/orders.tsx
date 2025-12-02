@@ -1,4 +1,4 @@
-import { Alert, Animated, FlatList, Image, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
+import { Alert, FlatList, Image, Modal, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React, { useCallback, useEffect, useState } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "expo-router";
@@ -12,7 +12,7 @@ import OrderItem from "@/components/OrderItem";
 import Toast from "react-native-toast-message";
 import Loader from "@/components/Loader";
 import { useFocusEffect } from "@react-navigation/native";
-import { useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
+import Animated, { useAnimatedStyle, useSharedValue, withSpring, withTiming } from "react-native-reanimated";
 import { LinearGradient } from "expo-linear-gradient";
 import { Feather } from "@expo/vector-icons";
 
@@ -30,6 +30,7 @@ interface Order {
   }[];
 }
 
+// Composant modale qui affiche le détail d'une commande
 const OrderDetailsModal =({
   visible, order, onClose
 } : {
@@ -37,25 +38,33 @@ const OrderDetailsModal =({
   order:Order|null;
   onClose: () => void;
 }) => {
+  //valeur pour l'animation d'apparition et disparition de la modale
   const translateY = useSharedValue(300);
   const opacity = useSharedValue(0);
 
-  React.useEffect(() => {
-    if (visible) {
-      translateY.value = withSpring(0, {damping: 15, stiffness: 100});
-      opacity.value = withTiming(1, {duration: 300});
-    } else {
-      translateY.value = withTiming(300, {duration: 200});
-      opacity.value = withTiming(0, {duration: 200})
-    }
-  }, [visible]);
+  //gere l'animation de la modale lorsque la valeur de "visible" change
+ React.useEffect(() => {
+        if (visible) {
+            // Fait remonter le modal avec un effet ressort
+            translateY.value = withSpring(0, {damping: 15, stiffness: 100});
+            // Fait apparaître le contenu en fondu
+            opacity.value = withTiming(1, {duration: 200});
+        } else {
+            // Fait redescendre le modal en bas de l’écran
+            translateY.value = withSpring(300, {duration: 200});
+            // Fait disparaître le contenu en fondu
+            opacity.value = withTiming(0, {duration: 200});
+        }
+    }, [visible]);
 
-  const animatedModalStyle = useAnimatedStyle(() => ({
-    transform: [{ translateY: translateY.value}],
-    opacity: opacity.value,
-  }));
+    // Style animé appliqué au container du modal
+    const animatedModalStyle = useAnimatedStyle(() =>({
+        transform: [{ translateY: translateY.value}],
+        opacity: opacity.value,
+    }));
 
-  if (!order) return null;
+    // Si aucune commande sélectionnée, ne rien rendre
+    if (!order) return null;
 
     return (
       <Modal
@@ -123,7 +132,6 @@ const OrderDetailsModal =({
                 >
                   <Text style={styles.closeButtonText}>Fermer</Text>
                 </TouchableOpacity>
-
             </LinearGradient>
           </Animated.View>
         </View>
@@ -289,6 +297,11 @@ const OrdersScreen = () => {
           onAction={() => router.push("/(tabs)/shop")}
         />
       )}
+      <OrderDetailsModal
+        visible={showModal}
+        order={selectedOrder}
+        onClose={handleCloseModal}
+      />
     </Wrapper>
   );
 };
@@ -343,7 +356,7 @@ const styles = StyleSheet.create({
   },
   modalContent: {
     width: "92%",
-    maxHeight: "85%",
+    // maxHeight: "85%",
     borderRadius: 16,
     overflow: "hidden",
   },

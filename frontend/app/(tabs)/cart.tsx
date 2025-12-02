@@ -27,7 +27,7 @@ const CartScreen = () => {
   const [loading, setLoading] = useState(false);
   const { user } = useAuthStore();
   const subtotal = getTotalPrice();
-  const shippingCost = subtotal < 100 ? 0 : 5.99;
+  const shippingCost = subtotal > 100 ? 0 : 5.99;
   const total = subtotal + shippingCost;
 
   // Verifie que l'utilisateur est connecté

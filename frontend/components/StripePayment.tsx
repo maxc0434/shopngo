@@ -41,7 +41,7 @@ import * as Linking from "expo-linking";
             const updatePaymentStatus = async () => { //maj du status de paiement dans Supabase 
                 const {error} = await supabase
                 .from("orders")
-                .update({ payment_status: "payé"})
+                .update({ payment_status: "success"})
                 .eq("id", orderId)
                 .select();
 

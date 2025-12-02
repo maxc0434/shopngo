@@ -60,7 +60,7 @@ const OrderItem = ({ order, onDelete, email, onViewDetails }: Props) => {
                                 total: order?.total_price,
                             }
                         })
-                    }}
+                    }},
                 ])
             }
     } catch (error) {
@@ -95,7 +95,7 @@ const OrderItem = ({ order, onDelete, email, onViewDetails }: Props) => {
             styles.orderStatus,
             {color: isPaid ? AppColors.success : AppColors.error},
         ]}>
-            Status: {isPaid ? "Paiement effectué" : "En attente" }
+            Statut: {isPaid ? "Paiement effectué" : "En attente" }
         </Text>
         <Text style={styles.orderDate}> Passée le: {new Date(order.created_at).toLocaleDateString()}</Text>
         
