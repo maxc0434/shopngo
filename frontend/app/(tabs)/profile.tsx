@@ -90,7 +90,6 @@ const ProfileScreen = () => {
       ),
       title: "Paramètres",
       onPress: () => {
-        // router.push("/(tabs)/cart")
       },
     },
   ];
@@ -134,7 +133,9 @@ const ProfileScreen = () => {
             </View>
             <View style={styles.profileInfo}>
               <Text style={styles.profileEmail}>{user?.email}</Text>
-              <TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => router.push("/(tabs)/profileEdit")}
+              >
                 <Text style={styles.editProfileText}>Modifier mon Profil</Text>
               </TouchableOpacity>
             </View>

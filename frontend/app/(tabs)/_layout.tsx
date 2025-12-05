@@ -1,6 +1,6 @@
 import { Tabs } from "expo-router";
 import React from "react";
-import { Ionicons, Foundation, Feather } from "@expo/vector-icons";
+import { Ionicons, Foundation, Feather, MaterialCommunityIcons } from "@expo/vector-icons";
 import { HapticTab } from "@/components/haptic-tab";
 import { Colors } from "@/constants/theme";
 import { useColorScheme } from "@/hooks/use-color-scheme";
@@ -45,6 +45,16 @@ export default function TabLayout() {
         }}
       />
 
+            <Tabs.Screen
+        name="delivery_address"
+        options={{
+          title: "Adresse de Livraison",
+          tabBarIcon: ({ color }) => (
+            <MaterialCommunityIcons size={28} name="truck-delivery" color={color} />
+          ),
+        }}
+      />
+
       <Tabs.Screen name="search" options={{ href: null}}/>
       <Tabs.Screen name="favorites" options={{ href: null}}/>
       <Tabs.Screen name="cart" options={{ href: null}}/>
@@ -53,9 +63,7 @@ export default function TabLayout() {
       <Tabs.Screen name="signup" options={{ href: null}}/>
       <Tabs.Screen name="orders" options={{ href: null}}/>
       <Tabs.Screen name="payment" options={{ href: null}}/>
-
-
-
+      <Tabs.Screen name="profileEdit" options={{ href: null}}/>
 
     </Tabs>
   );

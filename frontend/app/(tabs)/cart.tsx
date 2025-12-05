@@ -45,6 +45,29 @@ const CartScreen = () => {
     try {
       //On indique le chargement
       setLoading(true);
+
+      //Récupérer l'adresse de livraison depuis le profil utilisateur
+      const {data: profile, error: profileError} = await supabase
+        .from("profiles")
+        .select('"delivery_address"')
+        .eq("id", user.id)
+        .single();
+
+      //Gestion du cas "profil non trouvé"
+      if (profileError && profileError.code !== "PGRST116") {
+        Toast.show({
+          type: "error",
+          text1: "Erreur",
+          text2: "Impossible de récupérer l'adresse de livraison",
+          position: "bottom",
+          visibilityTime: 2000,
+        })
+        setLoading(false);
+        return;
+      }
+
+      const deliveryAddress = profile?.delivery_address || "";
+
       //Préparation pour insertion des données de la commande en BDD
       const orderData = {
         user_email: user.email,
@@ -57,6 +80,7 @@ const CartScreen = () => {
           image: item.product.image,
         })),
         payment_status: "en attente",
+        delivery_address: deliveryAddress,
       };
 
       //insertion de la commande dans la table orders
@@ -65,7 +89,6 @@ const CartScreen = () => {
         .insert([orderData])
         .select()
         .single();
-
       // gestion des erreurs à l'insertion
       if (error) {
         throw new Error(`Echec de sauvegarde de la commande: ${error.message}`);

@@ -28,10 +28,14 @@ const DeliveryAddressScreen = () => {
         .single(); // on récupère alors 1 seul objet
       setLoading(false); // une fois l'info récupéré, stop loading
       if (error) {
+        console.log("Error:", error);
         Alert.alert("Erreur", "Impossible de récupérer votre commande");
       } else if (data) {
+        console.log('OrderId:', data.id);
         //sinon on mémorise l'id de la commande
         setOrderId(data.id);
+      } else {
+        console.log('Info: Aucune commande trouvée');
       }
     };
     fetchLastOrder(); // Appel immédiat de la fonction dès que le composant est monté
@@ -40,13 +44,8 @@ const DeliveryAddressScreen = () => {
   const handleAddAddress = async () => {
     //fonction qui se déclenche au Press du bouton "ajouter l'adresse"
     console.log("User:", user?.id, "OrderId:", orderId);
-
-    // if (!orderId) {
-    //     Alert.alert("Erreur", "Aucune commande trouvée pour l'ajout de l'adresse");
-    //     return;
-    // }
-    if (!user?.email) {
-      Alert.alert("Erreur", "Veuillez vous connecter");
+    if (!user || !orderId) {
+      Alert.alert("Erreur", "Aucune commande récente trouvée pour l'ajout d'adresse");
       return;
     }
     if (!address.trim) {
@@ -55,11 +54,15 @@ const DeliveryAddressScreen = () => {
       return;
     }
     setLoading(true);
+
+
     const { error } = await supabase // requete pour mettre a jour l'adresse sur TOUTES les commandes
       .from("orders")
       .update({ delivery_address: address })
-      .eq("user_email", user.email);
+      .eq("id", orderId);
+
     setLoading(false);
+
     if (error) {
       Alert.alert("Erreur", "Impossible d'ajouter l'adresse");
     } else {

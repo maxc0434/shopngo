@@ -21,6 +21,7 @@ interface Order {
   total_price: number;
   payment_status: string;
   created_at: string;
+  delivery_address?: string;
   items: {
     product_id: number;
     title: string;
@@ -103,6 +104,9 @@ const OrderDetailsModal =({
                   <Text style={styles.modalText}>
                     Passée le: {new Date(order.created_at).toLocaleDateString()}
                   </Text>
+                  <Text>
+                    Adresse: {order.delivery_address || "Non spécifiée"}
+                  </Text>
                   <Text style={styles.modalSectionTitle}> Articles: </Text>
                   <FlatList
                     data={order.items}
@@ -143,6 +147,7 @@ const OrderDetailsModal =({
 const OrdersScreen = () => {
   const { user } = useAuthStore();
   const router = useRouter();
+
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -168,7 +173,7 @@ const OrdersScreen = () => {
       const { data, error } = await supabase // REQUETE qui recupére les orders en rapport a l'user connecté
         .from("orders") // dans la table orders
         .select(
-          "id, total_price, payment_status, created_at, items, user_email"
+          "id, total_price, payment_status, created_at, items, user_email, delivery_address"
         ) // tout ces champs
         .eq("user_email", user.email) // grace à l'email utilisateur qui est le login
         .order("created_at", { ascending: false }); // et tri par date et par ordre croissant les commandes
@@ -176,7 +181,7 @@ const OrdersScreen = () => {
       if (error) {
         throw new Error(`Failed to fetch orders: ${error.message}`);
       }
-      setOrders(data || []); // met à jours les données dans le tableau des commandes
+      setOrders(data ?? []); // met à jours les données dans le tableau des commandes
     } catch (error: any) {
       console.log("Error fetching orders:", error);
       setError(error.message || "echec dans le chargement de vos commandes");
