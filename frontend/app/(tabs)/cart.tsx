@@ -80,7 +80,7 @@ const CartScreen = () => {
           image: item.product.image,
         })),
         payment_status: "en attente",
-        delivery_address: deliveryAddress,
+        delivery_address: deliveryAddress, //Adresse de livraison depuis le profil
       };
 
       //insertion de la commande dans la table orders

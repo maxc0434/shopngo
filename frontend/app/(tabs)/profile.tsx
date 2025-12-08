@@ -80,7 +80,7 @@ const ProfileScreen = () => {
       icon: <Foundation name="home" size={20} color={AppColors.primary[500]} />,
       title: "Adresse de livraison",
       onPress: () => {
-        // router.push("/(tabs)/cart")
+        router.push("/(tabs)/delivery_address")
       },
     },
     {

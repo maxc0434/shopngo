@@ -67,7 +67,7 @@ const DeliveryAddressScreen = () => {
       Alert.alert("Erreur", "Impossible d'ajouter l'adresse");
     } else {
       Alert.alert("Succes", "adresse ajoutée avec succès");
-      router.back();
+      router.push('/(tabs)/orders');
     }
   };
 
