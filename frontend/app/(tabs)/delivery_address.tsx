@@ -2,7 +2,7 @@ import { Alert, StyleSheet, Text, TextInput, View } from "react-native";
 import React, { useEffect, useState } from "react";
 import { AppColors } from "@/constants/theme";
 import { useAuthStore } from "@/store/authStore";
-import { useRouter } from "expo-router";
+import { useLocalSearchParams, useRouter } from "expo-router";
 import { supabase } from "@/lib/supabase";
 import Button from "@/components/Button";
 
@@ -12,34 +12,35 @@ const DeliveryAddressScreen = () => {
 
   const [address, setAddress] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
-  const [orderId, setOrderId] = useState<string | null>(null);
+  // const [orderId, setOrderId] = useState<string | null>(null);
+  const {orderId} = useLocalSearchParams();
 
-  useEffect(() => {
-    const fetchLastOrder = async () => {
-      // recupération de la dernière commande de l'utilisateur
-      if (!user) return; // si pas de user connecté => stop fonction
-      setLoading(true); // demarrage du chargement
-      const { data, error } = await supabase // requete pour récupérer la dernier commande
-        .from("orders") // depuis table orders
-        .select("id") // selectionne l'id de la commande
-        .eq("user_email", user.email) // en l'associant au user qui est rattaché a cette commande
-        .order("created_at", { ascending: false }) // et en triant les commande par ordre descendant
-        .limit(1) // requete qui se limite a 1 reponse, donc la dernière commande
-        .single(); // on récupère alors 1 seul objet
-      setLoading(false); // une fois l'info récupéré, stop loading
-      if (error) {
-        console.log("Error:", error);
-        Alert.alert("Erreur", "Impossible de récupérer votre commande");
-      } else if (data) {
-        console.log('OrderId:', data.id);
-        //sinon on mémorise l'id de la commande
-        setOrderId(data.id);
-      } else {
-        console.log('Info: Aucune commande trouvée');
-      }
-    };
-    fetchLastOrder(); // Appel immédiat de la fonction dès que le composant est monté
-  }, [user]);
+  // useEffect(() => {
+  //   const fetchLastOrder = async () => {
+  //     // recupération de la dernière commande de l'utilisateur
+  //     if (!user) return; // si pas de user connecté => stop fonction
+  //     setLoading(true); // demarrage du chargement
+  //     const { data, error } = await supabase // requete pour récupérer la dernier commande
+  //       .from("orders") // depuis table orders
+  //       .select("id") // selectionne l'id de la commande
+  //       .eq("user_email", user.email) // en l'associant au user qui est rattaché a cette commande
+  //       .order("created_at", { ascending: false }) // et en triant les commande par ordre descendant
+  //       .limit(1) // requete qui se limite a 1 reponse, donc la dernière commande
+  //       .single(); // on récupère alors 1 seul objet
+  //     setLoading(false); // une fois l'info récupéré, stop loading
+  //     if (error) {
+  //       console.log("Error:", error);
+  //       Alert.alert("Erreur", "Impossible de récupérer votre commande");
+  //     } else if (data) {
+  //       console.log('OrderId:', data.id);
+  //       //sinon on mémorise l'id de la commande
+  //       setOrderId(data.id);
+  //     } else {
+  //       console.log('Info: Aucune commande trouvée');
+  //     }
+  //   };
+  //   fetchLastOrder(); // Appel immédiat de la fonction dès que le composant est monté
+  // }, [user]);
 
   const handleAddAddress = async () => {
     //fonction qui se déclenche au Press du bouton "ajouter l'adresse"
@@ -56,7 +57,7 @@ const DeliveryAddressScreen = () => {
     setLoading(true);
 
 
-    const { error } = await supabase // requete pour mettre a jour l'adresse sur TOUTES les commandes
+    const { error } = await supabase // requete pour mettre a jour l'adresse sur une commande spécifique
       .from("orders")
       .update({ delivery_address: address })
       .eq("id", orderId);

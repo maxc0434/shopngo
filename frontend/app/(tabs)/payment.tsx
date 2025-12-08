@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React from "react";
 import { AppColors } from "@/constants/theme";
 import Button from "@/components/Button";
@@ -6,13 +6,13 @@ import { useLocalSearchParams, useRouter } from "expo-router";
 import { useAuthStore } from "@/store/authStore";
 import StripePayment from "@/components/StripePayment";
 
-
-const getStringParam = (value: string | string[] | undefined): string =>
+// Fonction utilitaire pour extraire un paramètre sous forme de chaine de caractère. Ici orderId
+const getStringParam = (value: string | string[] | undefined): string => 
   Array.isArray(value) ? value[0] : value || "";
 const PaymentScreen = () => {
 
   const router = useRouter();
-  const { paymentIntent, ephemeralKey, customer, orderId, total } = useLocalSearchParams();
+  const { paymentIntent, ephemeralKey, customer, orderId, total } = useLocalSearchParams(); //useLocalSearchParam est lié a getStringParam, il va chercher le paramètre voulu
   const {user} = useAuthStore();
   const totalValue = Number(getStringParam(total));
 
@@ -29,6 +29,19 @@ const PaymentScreen = () => {
     <View style={styles.container}>
       <Text style={styles.title}>Complétez votre paiement</Text>
       <Text style={styles.subtitle}>Veuillez confirmer vos informations de paiement pour finaliser vos achats</Text>
+
+      <TouchableOpacity
+        style={styles.addressButton}
+        onPress={ () => router.push({
+          pathname: "/(tabs)/delivery_address", 
+          params: {orderId: getStringParam(orderId)}
+        }) }  
+        activeOpacity={0.7}
+      >
+        <Text style={styles.addressButtonText}>Modifier votre adresse de Livraison</Text>
+
+      </TouchableOpacity>
+
       <Text style={styles.totalPrice}> Total : {totalValue.toFixed(2)} €</Text>
       <Button
         title="Confirmez votre paiement"
@@ -73,4 +86,19 @@ const styles = StyleSheet.create({
   button: {
     marginTop: 20,
   },
+  addressButton: {
+    backgroundColor: AppColors.primary[50],
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginBottom: 24,
+    borderWidth: 1,
+    borderColor: AppColors.primary[200],
+  },
+  addressButtonText: {
+    fontFamily: "Inter-Medium",
+    fontSize: 16,
+    color: AppColors.primary[600]
+  }
 });
